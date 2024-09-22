@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int idx;   // 풍선의 번호
+    int value; // 풍선 안에 적힌 값
+} Balloon;
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    // 풍선 배열 동적 할당
+    Balloon* balloons = (Balloon*)malloc(n * sizeof(Balloon));
+    int* popped = (int*)malloc(n * sizeof(int)); // 풍선이 터졌는지 체크할 배열
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &balloons[i].value);
+        balloons[i].idx = i + 1;  // 풍선 번호는 1부터 시작
+        popped[i] = 0;            // 모든 풍선은 처음엔 터지지 않음
+    }
+
+    int current = 0; // 현재 위치한 풍선 인덱스
+    int count = 0;   // 터진 풍선 개수
+
+    // 첫 번째 풍선은 무조건 터뜨린다.
+    printf("%d ", balloons[current].idx);
+    int move = balloons[current].value;
+    popped[current] = 1;
+    count++;
+
+    while (count < n) {
+        // 이동해야 할 칸 수
+        if (move > 0) {
+            // 양수일 경우 오른쪽으로 이동
+            for (int i = 0; i < move; ) {
+                current = (current + 1) % n; // 원형 배열이므로 % n 사용
+                if (!popped[current]) i++;   // 터지지 않은 풍선을 만날 때만 카운트
+            }
+        } else {
+            // 음수일 경우 왼쪽으로 이동
+            for (int i = 0; i < -move; ) {
+                current = (current - 1 + n) % n; // 원형 배열이므로 % n 사용
+                if (!popped[current]) i++;       // 터지지 않은 풍선을 만날 때만 카운트
+            }
+        }
+
+        // 현재 풍선 터뜨리기
+        printf("%d ", balloons[current].idx);
+        move = balloons[current].value;
+        popped[current] = 1;
+        count++;
+    }
+
+    // 메모리 해제
+    free(balloons);
+    free(popped);
+
+    return 0;
+}
